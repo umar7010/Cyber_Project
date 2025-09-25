@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity News - CyberEdu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>CyberEdu
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/glossary">Glossary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/learning">Learning</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/news">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cheatsheets">Cheat Sheets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-cog me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-primary text-white py-4">
+        <div class="container">
+            <h1 class="mb-0">Cybersecurity News</h1>
+            <p class="mb-0">Latest cybersecurity incidents and analysis explained in simple terms</p>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search news articles...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="incidentTypeFilter">
+                    <option value="">All Incident Types</option>
+                    <option value="DATA_BREACH">Data Breach</option>
+                    <option value="MALWARE">Malware</option>
+                    <option value="PHISHING">Phishing</option>
+                    <option value="RANSOMWARE">Ransomware</option>
+                    <option value="SOCIAL_ENGINEERING">Social Engineering</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="severityFilter">
+                    <option value="">All Severities</option>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- News Articles -->
+    <div class="container pb-5">
+        <div class="row" id="articlesContainer">
+            <div th:each="article : ${articles}" class="col-md-6 col-lg-4 mb-4 article-card" 
+                 th:data-incident-type="${article.incidentType}" th:data-severity="${article.severity}">
+                <div class="card h-100">
+                    <div th:if="${article.imageUrl}" class="card-img-top-container">
+                        <img th:src="${article.imageUrl}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title" th:text="${article.title}">Article Title</h5>
+                            <span class="badge" th:classappend="${'bg-' + (article.severity == 'CRITICAL' ? 'danger' : article.severity == 'HIGH' ? 'warning' : article.severity == 'MEDIUM' ? 'info' : 'secondary')}" 
+                                  th:text="${article.severity}">Severity</span>
+                        </div>
+                        <p class="card-text" th:text="${article.summary}">Article summary...</p>
+                        <div class="mb-2">
+                            <span class="badge bg-primary" th:text="${article.incidentType}">Incident Type</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted" th:text="${#temporals.format(article.publishedAt, 'MMM dd, yyyy')}">Date</small>
+                            <button class="btn btn-outline-primary btn-sm" th:onclick="'viewArticle(' + ${article.id} + ')'">
+                                Read More
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="noResults" class="text-center py-5" style="display: none;">
+            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No articles found</h4>
+            <p class="text-muted">Try adjusting your search criteria</p>
+        </div>
+    </div>
+
+    <!-- Article Modal -->
+    <div class="modal fade" id="articleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="articleModalTitle">Article Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="articleModalBody">
+                    <!-- Article content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>CyberEdu</h5>
+                    <p>Your comprehensive cybersecurity education platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2024 CyberEdu. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Search and filter functionality
+        document.getElementById('searchInput').addEventListener('input', filterArticles);
+        document.getElementById('incidentTypeFilter').addEventListener('change', filterArticles);
+        document.getElementById('severityFilter').addEventListener('change', filterArticles);
+        
+        function filterArticles() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const incidentType = document.getElementById('incidentTypeFilter').value;
+            const severity = document.getElementById('severityFilter').value;
+            const articleCards = document.querySelectorAll('.article-card');
+            let visibleCount = 0;
+            
+            articleCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const summary = card.querySelector('.card-text').textContent.toLowerCase();
+                const cardIncidentType = card.dataset.incidentType;
+                const cardSeverity = card.dataset.severity;
+                
+                const matchesSearch = title.includes(searchTerm) || summary.includes(searchTerm);
+                const matchesIncidentType = !incidentType || cardIncidentType === incidentType;
+                const matchesSeverity = !severity || cardSeverity === severity;
+                
+                if (matchesSearch && matchesIncidentType && matchesSeverity) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+        
+        function viewArticle(articleId) {
+            // This would load the full article content
+            document.getElementById('articleModalTitle').textContent = 'Article Details';
+            document.getElementById('articleModalBody').innerHTML = `
+                <p>Full article content would be loaded here.</p>
+                <p>This would include:</p>
+                <ul>
+                    <li>Detailed incident analysis</li>
+                    <li>Impact assessment</li>
+                    <li>Lessons learned</li>
+                    <li>Prevention strategies</li>
+                </ul>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('articleModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

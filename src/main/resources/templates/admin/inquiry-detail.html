@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{admin/layout :: layout(~{::title/text()}, ~{::content})}">
+<head>
+    <title>Inquiry Details - CyberEdu Admin</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-question-circle me-2"></i>Inquiry Details</h2>
+            <a th:href="@{/admin/inquiries}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Inquiries
+            </a>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${inquiry}" class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Inquiry #<span th:text="${inquiry.id}">1</span></h5>
+                    <span class="badge bg-warning" th:if="${inquiry.status.name() == 'PENDING'}" th:text="${inquiry.status.name()}">PENDING</span>
+                    <span class="badge bg-success" th:if="${inquiry.status.name() == 'RESPONDED'}" th:text="${inquiry.status.name()}">RESPONDED</span>
+                    <span class="badge bg-secondary" th:if="${inquiry.status.name() != 'PENDING' and inquiry.status.name() != 'RESPONDED'}" th:text="${inquiry.status.name()}">OTHER</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-user me-2"></i>Contact Information</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Name:</strong></td>
+                                <td th:text="${inquiry.name}">John Doe</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>
+                                    <a th:href="'mailto:' + ${inquiry.email}" th:text="${inquiry.email}">john@example.com</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Subject:</strong></td>
+                                <td th:text="${inquiry.subject}">Question about cybersecurity</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Submitted:</strong></td>
+                                <td th:text="${#temporals.format(inquiry.createdAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2024 10:30</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-info-circle me-2"></i>Status Information</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td>
+                                    <span class="badge bg-warning" th:if="${inquiry.status.name() == 'PENDING'}" th:text="${inquiry.status.name()}">PENDING</span>
+                                    <span class="badge bg-success" th:if="${inquiry.status.name() == 'RESPONDED'}" th:text="${inquiry.status.name()}">RESPONDED</span>
+                                    <span class="badge bg-secondary" th:if="${inquiry.status.name() != 'PENDING' and inquiry.status.name() != 'RESPONDED'}" th:text="${inquiry.status.name()}">OTHER</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${inquiry.respondedAt}">
+                                <td><strong>Responded:</strong></td>
+                                <td th:text="${#temporals.format(inquiry.respondedAt, 'MMM dd, yyyy HH:mm')}">Jan 02, 2024 14:30</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="mb-4">
+                    <h6><i class="fas fa-comment me-2"></i>Message</h6>
+                    <div class="border p-3 bg-light rounded">
+                        <p th:text="${inquiry.message}" class="mb-0">This is the inquiry message content...</p>
+                    </div>
+                </div>
+                
+                <div th:if="${inquiry.adminResponse}" class="mb-4">
+                    <h6><i class="fas fa-reply me-2"></i>Admin Response</h6>
+                    <div class="border p-3 bg-info bg-opacity-10 rounded">
+                        <p th:text="${inquiry.adminResponse}" class="mb-0">This is the admin response...</p>
+                    </div>
+                </div>
+                
+                <!-- Response Form (only show if not responded) -->
+                <div th:unless="${inquiry.status.name() == 'RESPONDED'}" class="mt-4">
+                    <h6><i class="fas fa-edit me-2"></i>Respond to Inquiry</h6>
+                    <form th:action="@{/admin/inquiries/{id}/respond(id=${inquiry.id})}" method="post">
+                        <div class="mb-3">
+                            <label for="adminResponse" class="form-label">Your Response</label>
+                            <textarea class="form-control" id="adminResponse" name="adminResponse" rows="5" 
+                                      placeholder="Type your response here..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>Send Response
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Already Responded Message -->
+                <div th:if="${inquiry.status.name() == 'RESPONDED'}" class="mt-4">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        This inquiry has already been responded to.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div th:unless="${inquiry}" class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Inquiry not found.
+        </div>
+    </div>
+</body>
+</html>

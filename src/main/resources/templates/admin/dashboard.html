@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <style>
+        .admin-sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .admin-sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+        .admin-sidebar .nav-link:hover,
+        .admin-sidebar .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .admin-header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+        .admin-content {
+            padding: 2rem;
+            background: #f8f9fa;
+            min-height: calc(100vh - 80px);
+        }
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        .inquiry-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #007bff;
+        }
+        .inquiry-item.pending {
+            border-left-color: #ffc107;
+        }
+        .inquiry-item.responded {
+            border-left-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 admin-sidebar">
+                <div class="p-3">
+                    <h4 class="text-white mb-4">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        CyberEdu Admin
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" th:href="@{/admin}">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                        <a class="nav-link" th:href="@{/admin/glossary}">
+                            <i class="fas fa-book me-2"></i>
+                            Glossary Terms
+                        </a>
+                        <a class="nav-link" th:href="@{/admin/learning}">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            Learning Modules
+                        </a>
+                        <a class="nav-link" th:href="@{/admin/news}">
+                            <i class="fas fa-newspaper me-2"></i>
+                            News Articles
+                        </a>
+                        <a class="nav-link" th:href="@{/admin/cheatsheets}">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Cheat Sheets
+                        </a>
+                        <a class="nav-link" th:href="@{/admin/inquiries}">
+                            <i class="fas fa-envelope me-2"></i>
+                            Inquiries
+                            <span class="badge bg-danger ms-2" th:if="${pendingInquiries > 0}" th:text="${pendingInquiries}">0</span>
+                        </a>
+                        <hr class="text-white-50">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fas fa-external-link-alt me-2"></i>
+                            View Website
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <!-- Header -->
+                <div class="admin-header">
+                    <div class="container-fluid">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h2 class="mb-0">Dashboard</h2>
+                            </div>
+                            <div class="col-auto">
+                                <span class="text-muted">
+                                    <i class="fas fa-user-shield me-1"></i>
+                                    Administrator
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="admin-content">
+                    <!-- Stats Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon bg-primary me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0" th:text="${totalTerms}">0</h3>
+                                        <p class="text-muted mb-0">Glossary Terms</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon bg-success me-3">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0" th:text="${totalModules}">0</h3>
+                                        <p class="text-muted mb-0">Learning Modules</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon bg-info me-3">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0" th:text="${totalNews}">0</h3>
+                                        <p class="text-muted mb-0">News Articles</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stats-card">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon bg-warning me-3">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="mb-0" th:text="${totalCheatSheets}">0</h3>
+                                        <p class="text-muted mb-0">Cheat Sheets</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Inquiries -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="stats-card">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        Recent Inquiries
+                                    </h5>
+                                    <a th:href="@{/admin/inquiries}" class="btn btn-outline-primary btn-sm">
+                                        View All
+                                    </a>
+                                </div>
+                                
+                                <div th:if="${recentInquiries != null and !recentInquiries.empty}">
+                                    <div th:each="inquiry : ${recentInquiries}" class="inquiry-item" th:classappend="${inquiry.status.name() == 'PENDING'} ? 'pending' : 'responded'">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1" th:text="${inquiry.subject}">Subject</h6>
+                                                <p class="text-muted mb-1" th:text="${inquiry.name} + ' (' + ${inquiry.email} + ')'">Name (email)</p>
+                                                <p class="mb-0" th:text="${#strings.abbreviate(inquiry.message, 100)}">Message preview...</p>
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge" th:classappend="${inquiry.status.name() == 'PENDING'} ? 'bg-warning' : 'bg-success'" th:text="${inquiry.status.name()}">Status</span>
+                                                <br>
+                                                <small class="text-muted" th:text="${#temporals.format(inquiry.createdAt, 'MMM dd, yyyy')}">Date</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div th:if="${recentInquiries == null or recentInquiries.empty}" class="text-center py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No inquiries yet</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>

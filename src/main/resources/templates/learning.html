@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Modules - CyberEdu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>CyberEdu
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/glossary">Glossary</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/learning">Learning</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/news">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cheatsheets">Cheat Sheets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin">
+                            <i class="fas fa-cog me-1"></i>Admin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-primary text-white py-4">
+        <div class="container">
+            <h1 class="mb-0">Learning Modules</h1>
+            <p class="mb-0">Step-by-step cybersecurity education from fundamentals to advanced topics</p>
+        </div>
+    </div>
+
+    <!-- Learning Path -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="row" id="modulesContainer">
+                    <div th:each="module : ${modules}" class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title" th:text="${module.title}">Module Title</h5>
+                                    <span class="badge bg-primary" th:text="${module.difficulty}">Difficulty</span>
+                                </div>
+                                <p class="card-text" th:text="${module.description}">Module description...</p>
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <strong>Module Order:</strong> <span th:text="${module.moduleOrder}">1</span>
+                                    </small>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" th:onclick="'viewModule(' + ${module.id} + ')'">
+                                    <i class="fas fa-play me-1"></i>Start Learning
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Learning Path</h4>
+                        <p class="card-text">Follow our structured learning path to master cybersecurity concepts step by step.</p>
+                        
+                        <div class="mt-4">
+                            <h5>Difficulty Levels</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-success me-2">BEGINNER</span>
+                                <small class="text-muted">Basic concepts and terminology</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-warning me-2">INTERMEDIATE</span>
+                                <small class="text-muted">Practical applications and tools</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-danger me-2">ADVANCED</span>
+                                <small class="text-muted">Complex scenarios and analysis</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h5>What You'll Learn</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Core cybersecurity concepts
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Real-world examples and case studies
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Practical skills and techniques
+                                </li>
+                                <li class="mb-1">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Industry best practices
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Module Modal -->
+    <div class="modal fade" id="moduleModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="moduleModalTitle">Module Title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="moduleModalBody">
+                    <!-- Module content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>CyberEdu</h5>
+                    <p>Your comprehensive cybersecurity education platform.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2024 CyberEdu. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        function viewModule(moduleId) {
+            // This would load the module details and steps
+            // For now, we'll show a placeholder
+            document.getElementById('moduleModalTitle').textContent = 'Module Details';
+            document.getElementById('moduleModalBody').innerHTML = `
+                <p>Module content and steps will be loaded here.</p>
+                <p>This would include:</p>
+                <ul>
+                    <li>Step-by-step instructions</li>
+                    <li>Real-world examples</li>
+                    <li>Interactive content</li>
+                    <li>Media files and resources</li>
+                </ul>
+            `;
+            
+            const modal = new bootstrap.Modal(document.getElementById('moduleModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
